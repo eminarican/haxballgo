@@ -30,3 +30,21 @@ r.OnPlayerLeave(func(p room.Player) {
 
 println("room link:", r.Link())
 ```
+```json
+# note: auto-generated config.json
+{
+  "Bot": {
+    "Active": true,
+    "Name": "Bot"
+  },
+  "General": {
+    "Name": "My Room",
+    "Token": "",
+    "MaxPlayer": 16
+  },
+  "Security": {
+    "Public": false,
+    "Password": ""
+  }
+}
+```
