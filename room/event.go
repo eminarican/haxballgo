@@ -12,6 +12,7 @@ const (
 	eventPlayerLeave    = "onPlayerLeave"
 	eventPlayerChat     = "onPlayerChat"
 	eventPlayerBallKick = "onPlayerBallKick"
+	eventGameStart      = "onGameStart"
 )
 
 func registerEvents(p *rod.Page) {
@@ -45,6 +46,15 @@ func registerEvents(p *rod.Page) {
 			id: player.id
 		})
 	}`)
+
+	// onTeamGoal
+
+	p.MustEval(`room.onGameStart = function(player) {
+		emit({
+			type: "` + eventGameStart + `",
+			id: player.id
+		})
+	}`)
 }
 
 func proccessEvent(r *Room, j gson.JSON) (interface{}, error) {
@@ -56,25 +66,27 @@ func proccessEvent(r *Room, j gson.JSON) (interface{}, error) {
 		p := newPlayer(r, obj["id"].Int())
 		fun := r.events[eventPlayerJoin].(func(Player))
 		fun(p)
-		return nil, nil
 	case eventPlayerLeave:
 		p := newPlayer(r, obj["id"].Int())
 		fun := r.events[eventPlayerLeave].(func(Player))
 		fun(p)
-		return nil, nil
 	case eventPlayerChat:
 		p := newPlayer(r, obj["id"].Int())
 		msg := obj["message"].String()
 		fun := r.events[eventPlayerChat].(func(Player, string))
 		fun(p, msg)
-		return nil, nil
 	case eventPlayerBallKick:
 		p := newPlayer(r, obj["id"].Int())
 		fun := r.events[eventPlayerBallKick].(func(Player))
 		fun(p)
-		return nil, nil
+	case eventGameStart:
+		p := newPlayer(r, obj["id"].Int())
+		fun := r.events[eventGameStart].(func(Player))
+		fun(p)
+	default:
+		return nil, fmt.Errorf("event type %v is invalid", typ)
 	}
-	return nil, fmt.Errorf("event type %v is invalid", typ)
+	return nil, nil
 }
 
 func (r *Room) OnPlayerJoin(fun func(Player)) {
@@ -89,6 +101,10 @@ func (r *Room) OnPlayerChat(fun func(p Player, msg string)) {
 	r.events[eventPlayerChat] = fun
 }
 
-func (r *Room) OnPlayerBallKick(fun func(p Player)) {
+func (r *Room) OnPlayerBallKick(fun func(Player)) {
 	r.events[eventPlayerBallKick] = fun
+}
+
+func (r *Room) OnGameStart(fun func(by Player)) {
+	r.events[eventGameStart] = fun
 }
