@@ -16,6 +16,10 @@ func main() {
 		println("A player leaved from room!")
 	})
 
+	r.OnPlayerChat(func(p room.Player, msg string) {
+		println("message:", msg)
+	})
+
 	println("Successfully started! Room link:", r.Link())
 
 	select {}
