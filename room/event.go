@@ -17,6 +17,7 @@ const (
 	eventGameTick       = "onGameTick"
 	eventPositionsReset = "onPositionsReset"
 	eventPlayerActivity = "onPlayerActivity"
+	eventRoomLink       = "onRoomLink"
 )
 
 func registerEvents(p *rod.Page) {
@@ -92,6 +93,17 @@ func registerEvents(p *rod.Page) {
 			id: player.id
 		})
 	}`)
+
+	// onStadiumChange
+
+	p.MustEval(`room.onRoomLink = function(link) {
+		emit({
+			type: "` + eventRoomLink + `",
+			link: link
+		})
+	}`)
+
+	// onKickRateLimitSet
 }
 
 func proccessEvent(r *Room, j gson.JSON) (interface{}, error) {
@@ -134,6 +146,10 @@ func proccessEvent(r *Room, j gson.JSON) (interface{}, error) {
 		p := newPlayer(r, obj["id"].Int())
 		fun := r.events[typ].(func(Player))
 		fun(p)
+	case eventRoomLink:
+		link := obj["link"].String()
+		fun := r.events[typ].(func(string))
+		fun(link)
 	default:
 		return nil, fmt.Errorf("event type %v is invalid", typ)
 	}
@@ -174,4 +190,8 @@ func (r *Room) OnPositionsReset(fun func()) {
 
 func (r *Room) OnPlayerActivity(fun func(Player)) {
 	r.events[eventPlayerActivity] = fun
+}
+
+func (r *Room) OnRoomLink(fun func(link string)) {
+	r.events[eventRoomLink] = fun
 }
