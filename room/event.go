@@ -153,6 +153,11 @@ func proccessEvent(r *Room, j gson.JSON) (interface{}, error) {
 		p := newPlayer(r, obj["id"].Int())
 		fun := r.events[typ].(func(Player))
 		fun(p)
+	case eventStadiumChange:
+		by := newPlayer(r, obj["id"].Int())
+		stadium := obj["stadium"].String()
+		fun := r.events[typ].(func(string, Player))
+		fun(stadium, by)
 	case eventRoomLink:
 		link := obj["link"].String()
 		fun := r.events[typ].(func(string))
