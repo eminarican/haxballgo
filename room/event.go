@@ -15,6 +15,8 @@ const (
 	eventGameStart        = "onGameStart"
 	eventGameStop         = "onGameStop"
 	eventGameTick         = "onGameTick"
+	eventGamePause        = "onGamePause"
+	eventGameUnpause      = "onGameUnpause"
 	eventPositionsReset   = "onPositionsReset"
 	eventPlayerActivity   = "onPlayerActivity"
 	eventStadiumChange    = "onStadiumChange"
@@ -80,8 +82,19 @@ func registerEvents(p *rod.Page) {
 		})
 	}`)
 
-	// onGamePause
-	// onGameUnpause
+	p.MustEval(`room.onGamePause = function(by) {
+		emit({
+			type: "` + eventGamePause + `",
+			id: by.id
+		})
+	}`)
+
+	p.MustEval(`room.onGameUnpause = function(by) {
+		emit({
+			type: "` + eventGameUnpause + `",
+			id: by.id
+		})
+	}`)
 
 	p.MustEval(`room.onPositionsReset = function() {
 		emit({
@@ -155,6 +168,14 @@ func proccessEvent(r *Room, j gson.JSON) (interface{}, error) {
 	case eventGameTick:
 		fun := r.events[typ].(func())
 		fun()
+	case eventGamePause:
+		by := newPlayer(r, obj["id"].Int())
+		fun := r.events[typ].(func(Player))
+		fun(by)
+	case eventGameUnpause:
+		by := newPlayer(r, obj["id"].Int())
+		fun := r.events[typ].(func(Player))
+		fun(by)
 	case eventPositionsReset:
 		fun := r.events[typ].(func())
 		fun()
@@ -210,6 +231,14 @@ func (r *Room) OnGameStop(fun func(by Player)) {
 
 func (r *Room) OnGameTick(fun func()) {
 	r.events[eventGameTick] = fun
+}
+
+func (r *Room) OnGamePause(fun func(Player)) {
+	r.events[eventGamePause] = fun
+}
+
+func (r *Room) OnGameUnpause(fun func(Player)) {
+	r.events[eventGameUnpause] = fun
 }
 
 func (r *Room) OnPositionsReset(fun func()) {
