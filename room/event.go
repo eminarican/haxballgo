@@ -17,6 +17,7 @@ const (
 	eventGameTick       = "onGameTick"
 	eventPositionsReset = "onPositionsReset"
 	eventPlayerActivity = "onPlayerActivity"
+	eventStadiumChange  = "onStadiumChange"
 	eventRoomLink       = "onRoomLink"
 )
 
@@ -94,7 +95,13 @@ func registerEvents(p *rod.Page) {
 		})
 	}`)
 
-	// onStadiumChange
+	p.MustEval(`room.onStadiumChange = function(stadium, by) {
+		emit({
+			type: "` + eventStadiumChange + `",
+			stadium: stadium,
+			id: by.id
+		})
+	}`)
 
 	p.MustEval(`room.onRoomLink = function(link) {
 		emit({
@@ -190,6 +197,10 @@ func (r *Room) OnPositionsReset(fun func()) {
 
 func (r *Room) OnPlayerActivity(fun func(Player)) {
 	r.events[eventPlayerActivity] = fun
+}
+
+func (r *Room) OnStadiumChange(fun func(stadium string, by Player)) {
+	r.events[eventStadiumChange] = fun
 }
 
 func (r *Room) OnRoomLink(fun func(link string)) {
