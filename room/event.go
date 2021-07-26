@@ -14,6 +14,7 @@ const (
 	eventPlayerBallKick = "onPlayerBallKick"
 	eventGameStart      = "onGameStart"
 	eventGameStop       = "onGameStop"
+	eventGameTick       = "onGameTick"
 )
 
 func registerEvents(p *rod.Page) {
@@ -63,6 +64,16 @@ func registerEvents(p *rod.Page) {
 			id: player.id
 		})
 	}`)
+
+	// onPlayerAdminChange
+	// onPlayerTeamChange
+	// onPlayerKicked
+
+	p.MustEval(`room.onGameTick = function() {
+		emit({
+			type: "` + eventGameTick + `"
+		})
+	}`)
 }
 
 func proccessEvent(r *Room, j gson.JSON) (interface{}, error) {
@@ -95,6 +106,9 @@ func proccessEvent(r *Room, j gson.JSON) (interface{}, error) {
 		p := newPlayer(r, obj["id"].Int())
 		fun := r.events[eventGameStop].(func(Player))
 		fun(p)
+	case eventGameTick:
+		fun := r.events[eventGameTick].(func())
+		fun()
 	default:
 		return nil, fmt.Errorf("event type %v is invalid", typ)
 	}
@@ -123,4 +137,8 @@ func (r *Room) OnGameStart(fun func(by Player)) {
 
 func (r *Room) OnGameStop(fun func(by Player)) {
 	r.events[eventGameStop] = fun
+}
+
+func (r *Room) OnGameTick(fun func()) {
+	r.events[eventGameTick] = fun
 }
