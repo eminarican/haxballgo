@@ -8,9 +8,10 @@ import (
 )
 
 const (
-	eventPlayerJoin  = "onPlayerJoin"
-	eventPlayerLeave = "onPlayerLeave"
-	eventPlayerChat  = "onPlayerChat"
+	eventPlayerJoin     = "onPlayerJoin"
+	eventPlayerLeave    = "onPlayerLeave"
+	eventPlayerChat     = "onPlayerChat"
+	eventPlayerBallKick = "onPlayerBallKick"
 )
 
 func registerEvents(p *rod.Page) {
@@ -37,6 +38,13 @@ func registerEvents(p *rod.Page) {
 			id: player.id
 		})
 	}`)
+
+	p.MustEval(`room.onPlayerBallKick = function(player) {
+		emit({
+			type: "` + eventPlayerBallKick + `",
+			id: player.id
+		})
+	}`)
 }
 
 func proccessEvent(r *Room, j gson.JSON) (interface{}, error) {
@@ -60,6 +68,11 @@ func proccessEvent(r *Room, j gson.JSON) (interface{}, error) {
 		fun := r.events[eventPlayerChat].(func(Player, string))
 		fun(p, msg)
 		return nil, nil
+	case eventPlayerBallKick:
+		p := newPlayer(r, obj["id"].Int())
+		fun := r.events[eventPlayerBallKick].(func(Player))
+		fun(p)
+		return nil, nil
 	}
 	return nil, fmt.Errorf("event type %v is invalid", typ)
 }
@@ -74,4 +87,8 @@ func (r *Room) OnPlayerLeave(fun func(Player)) {
 
 func (r *Room) OnPlayerChat(fun func(p Player, msg string)) {
 	r.events[eventPlayerChat] = fun
+}
+
+func (r *Room) OnPlayerBallKick(fun func(p Player)) {
+	r.events[eventPlayerBallKick] = fun
 }

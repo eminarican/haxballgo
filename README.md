@@ -27,7 +27,6 @@ r.OnPlayerLeave(func(p room.Player) {
 	println("a player leaved!")
 })
 
-
 println("room link:", r.Link())
 ```
 ```json
