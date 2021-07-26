@@ -15,6 +15,8 @@ const (
 	eventGameStart      = "onGameStart"
 	eventGameStop       = "onGameStop"
 	eventGameTick       = "onGameTick"
+	eventPositionsReset = "onPositionsReset"
+	eventPlayerActivity = "onPlayerActivity"
 )
 
 func registerEvents(p *rod.Page) {
@@ -74,6 +76,22 @@ func registerEvents(p *rod.Page) {
 			type: "` + eventGameTick + `"
 		})
 	}`)
+
+	// onGamePause
+	// onGameUnpause
+
+	p.MustEval(`room.onPositionsReset = function() {
+		emit({
+			type: "` + eventPositionsReset + `"
+		})
+	}`)
+
+	p.MustEval(`room.onPlayerActivity = function(player) {
+		emit({
+			type: "` + eventPlayerActivity + `",
+			id: player.id
+		})
+	}`)
 }
 
 func proccessEvent(r *Room, j gson.JSON) (interface{}, error) {
@@ -83,32 +101,39 @@ func proccessEvent(r *Room, j gson.JSON) (interface{}, error) {
 	switch typ {
 	case eventPlayerJoin:
 		p := newPlayer(r, obj["id"].Int())
-		fun := r.events[eventPlayerJoin].(func(Player))
+		fun := r.events[typ].(func(Player))
 		fun(p)
 	case eventPlayerLeave:
 		p := newPlayer(r, obj["id"].Int())
-		fun := r.events[eventPlayerLeave].(func(Player))
+		fun := r.events[typ].(func(Player))
 		fun(p)
 	case eventPlayerChat:
 		p := newPlayer(r, obj["id"].Int())
 		msg := obj["message"].String()
-		fun := r.events[eventPlayerChat].(func(Player, string))
+		fun := r.events[typ].(func(Player, string))
 		fun(p, msg)
 	case eventPlayerBallKick:
 		p := newPlayer(r, obj["id"].Int())
-		fun := r.events[eventPlayerBallKick].(func(Player))
+		fun := r.events[typ].(func(Player))
 		fun(p)
-	case eventGameStart:
+	case eventGameStart: // todo: nullable player
 		p := newPlayer(r, obj["id"].Int())
-		fun := r.events[eventGameStart].(func(Player))
+		fun := r.events[typ].(func(Player))
 		fun(p)
-	case eventGameStop:
+	case eventGameStop: // todo: nullable player
 		p := newPlayer(r, obj["id"].Int())
-		fun := r.events[eventGameStop].(func(Player))
+		fun := r.events[typ].(func(Player))
 		fun(p)
 	case eventGameTick:
-		fun := r.events[eventGameTick].(func())
+		fun := r.events[typ].(func())
 		fun()
+	case eventPositionsReset:
+		fun := r.events[typ].(func())
+		fun()
+	case eventPlayerActivity:
+		p := newPlayer(r, obj["id"].Int())
+		fun := r.events[typ].(func(Player))
+		fun(p)
 	default:
 		return nil, fmt.Errorf("event type %v is invalid", typ)
 	}
@@ -141,4 +166,12 @@ func (r *Room) OnGameStop(fun func(by Player)) {
 
 func (r *Room) OnGameTick(fun func()) {
 	r.events[eventGameTick] = fun
+}
+
+func (r *Room) OnPositionsReset(fun func()) {
+	r.events[eventPositionsReset] = fun
+}
+
+func (r *Room) OnPlayerActivity(fun func(Player)) {
+	r.events[eventPlayerActivity] = fun
 }
