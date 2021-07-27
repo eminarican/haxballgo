@@ -93,6 +93,21 @@ func (r *Room) SetTimeLimit(val int) {
     r.page.MustEval(`room.setTimeLimit(` + strconv.Itoa(val) + `)`)
 }
 
+// Parses the value as a .hbs stadium file and sets it as the selected stadium.
+//
+// There must not be a game in progress, if a game is in progress this method does nothing.
+func (r *Room) SetCustomStadium(val string) {
+	r.page.MustEval(`room.setCustomStadium(` + val + `)`)
+}
+
+// Sets the selected stadium to one of the default stadiums.
+// The name must match exactly. (case sensitive)
+//
+// There must not be a game in progress, if a game is in progress this method does nothing.
+func (r *Room) SetDefaultStadium(name string) {
+	r.page.MustEval(`room.setDefaultStadium(` + name + `)`)
+}
+
 // Gets a player from room. (returns nil if player doesn't exists)
 func (r *Room) GetPlayer(id int) *Player {
 	defer r.pMutex.RUnlock()
