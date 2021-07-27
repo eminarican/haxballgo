@@ -115,6 +115,16 @@ func (r *Room) SetTeamsLock(val bool) {
 
 // setTeamColors
 
+// Starts the game, if a game is already in progress this method does nothing.
+func (r *Room) StartGame() {
+	r.page.MustEval(`room.startGame()`)
+}
+
+// Stops the game, if no game is in progress this method does nothing.
+func (r *Room) StopGame() {
+	r.page.MustEval(`room.stopGame()`)
+}
+
 // Gets a player from room. (returns nil if player doesn't exists)
 func (r *Room) GetPlayer(id int) *Player {
 	defer r.pMutex.RUnlock()
