@@ -16,9 +16,10 @@ type Room struct {
 	browser *rod.Browser
 	events  map[string]interface{}
 	players map[int]*Player
-	pMutex sync.RWMutex
+	pMutex  sync.RWMutex
 }
 
+// Creates a new room
 func New() *Room {
 	conf, err := readConfig()
 	if err != nil {
@@ -50,18 +51,25 @@ func New() *Room {
 	return r
 }
 
+// Obtains room link (if token is invalid just pauses program)
 func (r *Room) Link() string {
+	// todo: replace this with event based one
 	return r.page.MustElement("#roomlink a").MustText()
 }
 
+// Shuts down room
 func (r *Room) Shutdown() {
 	r.browser.MustClose()
 }
 
+// Sends a host announcement with msg as contents. Unlike sendChat,
+// announcements will work without a host player and has a larger limit on the number of characters.
 func (r *Room) Announce(msg string) {
+	// todo: add missing fields
 	r.page.MustEval(`room.sendAnnouncement("` + msg + `")`)
 }
 
+// Gets a player from room (returns nil if player doesn't exists)
 func (r *Room) GetPlayer(id int) *Player {
 	defer r.pMutex.RUnlock()
 	r.pMutex.RLock()
@@ -72,13 +80,13 @@ func (r *Room) GetPlayer(id int) *Player {
 func (r *Room) setPlayer(id int, p *Player) {
 	defer r.pMutex.Unlock()
 	r.pMutex.Lock()
-	
+
 	r.players[id] = p
 }
 
 func (r *Room) removePlayer(id int) {
-    defer r.pMutex.Unlock()
+	defer r.pMutex.Unlock()
 	r.pMutex.Lock()
-	
+
 	delete(r.players, id)
 }
