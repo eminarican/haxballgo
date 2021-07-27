@@ -8,24 +8,25 @@ import (
 )
 
 const (
-	eventPlayerJoin       = "onPlayerJoin"
-	eventPlayerLeave      = "onPlayerLeave"
-	eventPlayerChat       = "onPlayerChat"
-	eventPlayerBallKick   = "onPlayerBallKick"
-	eventGameStart        = "onGameStart"
-	eventGameStop         = "onGameStop"
-	eventGameTick         = "onGameTick"
-	eventGamePause        = "onGamePause"
-	eventGameUnpause      = "onGameUnpause"
-	eventPositionsReset   = "onPositionsReset"
-	eventPlayerActivity   = "onPlayerActivity"
-	eventStadiumChange    = "onStadiumChange"
-	eventRoomLink         = "onRoomLink"
-	eventKickRateLimitSet = "onKickRateLimitSet"
+	eventPlayerJoin        = "onPlayerJoin"
+	eventPlayerLeave       = "onPlayerLeave"
+	eventPlayerChat        = "onPlayerChat"
+	eventPlayerBallKick    = "onPlayerBallKick"
+	eventGameStart         = "onGameStart"
+	eventGameStop          = "onGameStop"
+	eventPlayerAdminChange = "onPlayerAdminChange"
+	eventGameTick          = "onGameTick"
+	eventGamePause         = "onGamePause"
+	eventGameUnpause       = "onGameUnpause"
+	eventPositionsReset    = "onPositionsReset"
+	eventPlayerActivity    = "onPlayerActivity"
+	eventStadiumChange     = "onStadiumChange"
+	eventRoomLink          = "onRoomLink"
+	eventKickRateLimitSet  = "onKickRateLimitSet"
 )
 
 func registerEvents(r *Room, p *rod.Page) {
-	r.OnPlayerJoin(func (p *Player) {})
+	r.OnPlayerJoin(func(p *Player) {})
 	r.OnPlayerLeave(func(p *Player) {})
 	r.OnPlayerChat(func(p *Player, msg string) {})
 	r.OnPlayerBallKick(func(p *Player) {})
@@ -89,7 +90,13 @@ func registerEvents(r *Room, p *rod.Page) {
 		})
 	}`)
 
-	// onPlayerAdminChange
+	p.MustEval(`room.onPlayerAdminChange = function(player, by) {
+		emit({
+			type: "` + eventPlayerAdminChange + `",
+			id: player.id,
+			by: by.id
+		})
+	}`)
 	// onPlayerTeamChange
 	// onPlayerKicked
 
@@ -181,9 +188,14 @@ func proccessEvent(r *Room, j gson.JSON) (interface{}, error) {
 		fun := r.events[typ].(func(*Player))
 		fun(p)
 	case eventGameStop:
-	    p := r.GetPlayer(obj["id"].Int())
+		p := r.GetPlayer(obj["id"].Int())
 		fun := r.events[typ].(func(*Player))
 		fun(p)
+	case eventPlayerAdminChange:
+		p := r.GetPlayer(obj["id"].Int())
+		by := r.GetPlayer(obj["by"].Int())
+		fun := r.events[typ].(func(*Player, *Player))
+		fun(p, by)
 	case eventGameTick:
 		fun := r.events[typ].(func())
 		fun()
@@ -246,6 +258,10 @@ func (r *Room) OnGameStart(fun func(by *Player)) {
 
 func (r *Room) OnGameStop(fun func(by *Player)) {
 	r.events[eventGameStop] = fun
+}
+
+func (r *Room) OnPlayerAdminChange(fun func(p *Player, by *Player)) {
+	r.events[eventPlayerAdminChange] = fun
 }
 
 func (r *Room) OnGameTick(fun func()) {
