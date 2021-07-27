@@ -86,6 +86,13 @@ func (r *Room) ClearBans() {
 	r.page.MustEval(`room.clearBans()`)
 }
 
+// Sets the time limit of the room. The limit must be specified in number of minutes.
+//
+// If a game is in progress this method does nothing.
+func (r *Room) SetTimeLimit(val int) {
+    r.page.MustEval(`room.setTimeLimit(` + strconv.Itoa(val) + `)`)
+}
+
 // Gets a player from room. (returns nil if player doesn't exists)
 func (r *Room) GetPlayer(id int) *Player {
 	defer r.pMutex.RUnlock()
