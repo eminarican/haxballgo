@@ -130,6 +130,18 @@ func (r *Room) PauseGame(val bool) {
     r.page.MustEval(`room.pauseGame(` + strconv.FormatBool(val) + `)`)
 }
 
+// Returns the current list of players.
+func (r *Room) GetPlayers() []*Player {
+    defer r.pMutex.RUnlock()
+	r.pMutex.Lock()
+
+    slice := make([]*Player, len(r.players))
+    for _, p := range r.players {
+		slice = append(slice, p)
+	}
+	return slice
+}
+
 // Gets a player from room. (returns nil if player doesn't exists)
 func (r *Room) GetPlayer(id int) *Player {
 	defer r.pMutex.RUnlock()
