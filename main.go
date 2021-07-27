@@ -16,8 +16,9 @@ func main() {
 		println("A player leaved from room!")
 	})
 
-	r.OnPlayerChat(func(p *room.Player, msg string) {
-		println(p.Name() + ":", msg)
+	r.OnPlayerChat(func(p *room.Player, msg string) (send bool) {
+		println(p.Name()+":", msg)
+		return true
 	})
 
 	println("Successfully started! Room link:", r.Link())

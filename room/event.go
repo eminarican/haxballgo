@@ -30,7 +30,7 @@ const (
 func registerEvents(r *Room, p *rod.Page) {
 	r.OnPlayerJoin(func(p *Player) {})
 	r.OnPlayerLeave(func(p *Player) {})
-	r.OnPlayerChat(func(p *Player, msg string) {})
+	r.OnPlayerChat(func(p *Player, msg string) (send bool) { return true })
 	r.OnPlayerBallKick(func(p *Player) {})
 	r.OnGameStart(func(by *Player) {})
 	r.OnGameStop(func(by *Player) {})
@@ -38,8 +38,8 @@ func registerEvents(r *Room, p *rod.Page) {
 	r.OnPlayerTeamChange(func(p, by *Player) {})
 	r.OnPlayerKicked(func(p *Player, reason string, ban bool, by *Player) {})
 	r.OnGameTick(func() {})
-	r.OnGamePause(func(p *Player) {})
-	r.OnGameUnpause(func(p *Player) {})
+	r.OnGamePause(func(by *Player) {})
+	r.OnGameUnpause(func(by *Player) {})
 	r.OnPositionsReset(func() {})
 	r.OnPlayerActivity(func(p *Player) {})
 	r.OnStadiumChange(func(stadium string, by *Player) {})
@@ -64,8 +64,9 @@ func registerEvents(r *Room, p *rod.Page) {
 
 	// onTeamVictory
 
+	// todo: find out why it's not working
 	p.MustEval(`room.onPlayerChat = function(player, message) {
-		emit({
+		return emit({
 			type: "` + eventPlayerChat + `",
 			message: message,
 			id: player.id
@@ -198,8 +199,10 @@ func proccessEvent(r *Room, j gson.JSON) (interface{}, error) {
 	case eventPlayerChat:
 		p := r.GetPlayer(obj["id"].Int())
 		msg := obj["message"].String()
-		fun := r.events[typ].(func(*Player, string))
-		fun(p, msg)
+		fun := r.events[typ].(func(*Player, string) (send bool))
+		if !fun(p, msg) {
+			return false, nil
+		}
 	case eventPlayerBallKick:
 		p := r.GetPlayer(obj["id"].Int())
 		fun := r.events[typ].(func(*Player))
@@ -269,70 +272,107 @@ func proccessEvent(r *Room, j gson.JSON) (interface{}, error) {
 	return nil, nil
 }
 
+// Event called when a new player joins the room.
 func (r *Room) OnPlayerJoin(fun func(*Player)) {
 	r.events[eventPlayerJoin] = fun
 }
 
+// Event called when a player leaves the room.
 func (r *Room) OnPlayerLeave(fun func(*Player)) {
 	r.events[eventPlayerLeave] = fun
 }
 
-func (r *Room) OnPlayerChat(fun func(p *Player, msg string)) {
+// Event called when a player sends a chat message.
+//
+// The event function can return `false` in order to filter the chat message.
+// This prevents the chat message from reaching other players in the room.
+func (r *Room) OnPlayerChat(fun func(p *Player, msg string) (send bool)) {
 	r.events[eventPlayerChat] = fun
 }
 
+// Event called when a player kicks the ball.
 func (r *Room) OnPlayerBallKick(fun func(*Player)) {
 	r.events[eventPlayerBallKick] = fun
 }
 
+// Event called when a game starts.
+//
+// `by` is the player which caused the event (can be null if the event wasn't caused by a player).
 func (r *Room) OnGameStart(fun func(by *Player)) {
 	r.events[eventGameStart] = fun
 }
 
+// Event called when a game stops.
+//
+// `by` is the player which caused the event (can be null if the event wasn't caused by a player).
 func (r *Room) OnGameStop(fun func(by *Player)) {
 	r.events[eventGameStop] = fun
 }
 
+// Event called when a player's admin rights are changed.
+//
+// `by` is the player which caused the event (can be null if the event wasn't caused by a player).
 func (r *Room) OnPlayerAdminChange(fun func(p *Player, by *Player)) {
 	r.events[eventPlayerAdminChange] = fun
 }
 
+// Event called when a player team is changed.
+//
+// `by` is the player which caused the event (can be null if the event wasn't caused by a player).
 func (r *Room) OnPlayerTeamChange(fun func(p *Player, by *Player)) {
 	r.events[eventPlayerTeamChange] = fun
 }
 
+// Event called when a player has been kicked from the room. This is always called after the onPlayerLeave event.
+//
+// `by` is the player which caused the event (can be null if the event wasn't caused by a player).
 func (r *Room) OnPlayerKicked(fun func(p *Player, reason string, ban bool, by *Player)) {
 	r.events[eventPlayerKicked] = fun
 }
 
+// Event called once for every game tick (happens 60 times per second).
+// This is useful if you want to monitor the player and ball positions without missing any ticks.
+//
+// This event is not called if the game is paused or stopped.
 func (r *Room) OnGameTick(fun func()) {
 	r.events[eventGameTick] = fun
 }
 
-func (r *Room) OnGamePause(fun func(*Player)) {
+// Event called when the game is paused.
+func (r *Room) OnGamePause(fun func(by *Player)) {
 	r.events[eventGamePause] = fun
 }
 
-func (r *Room) OnGameUnpause(fun func(*Player)) {
+// Event called when the game is unpaused.
+//
+// After this event there's a timer before the game is fully unpaused,
+// to detect when the game has really resumed you can listen for
+// the first onGameTick event after this event is called.
+func (r *Room) OnGameUnpause(fun func(by *Player)) {
 	r.events[eventGameUnpause] = fun
 }
 
+// Event called when the players and ball positions are reset after a goal happens.
 func (r *Room) OnPositionsReset(fun func()) {
 	r.events[eventPositionsReset] = fun
 }
 
+// Event called when a player gives signs of activity, such as pressing a key. This is useful for detecting inactive players.
 func (r *Room) OnPlayerActivity(fun func(*Player)) {
 	r.events[eventPlayerActivity] = fun
 }
 
+// Event called when the stadium is changed.
 func (r *Room) OnStadiumChange(fun func(stadium string, by *Player)) {
 	r.events[eventStadiumChange] = fun
 }
 
+// Event called when the room link is obtained.
 func (r *Room) OnRoomLink(fun func(link string)) {
 	r.events[eventRoomLink] = fun
 }
 
+// Event called when the kick rate is set.
 func (r *Room) OnKickRateLimitSet(fun func(min int, rate int, burst int, by *Player)) {
 	r.events[eventKickRateLimitSet] = fun
 }
