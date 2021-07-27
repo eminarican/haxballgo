@@ -43,3 +43,8 @@ func (p *Player) SendMessage(msg string) {
 func (p *Player) SetAdmin(val bool) {
 	p.room.page.MustEval(`room.setPlayerAdmin(` + strconv.Itoa(p.id) + `, ` + strconv.FormatBool(val) + `)`)
 }
+
+// Kicks player from room with aditional ban option
+func (p *Player) Kick(reason string, ban bool) {
+	p.room.page.MustEval(`room.kickPlayer(` + strconv.Itoa(p.id) + `, "` + reason + `", ` + strconv.FormatBool(ban) + `)`)
+}
