@@ -16,6 +16,7 @@ const (
 	eventGameStop          = "onGameStop"
 	eventPlayerAdminChange = "onPlayerAdminChange"
 	eventPlayerTeamChange  = "onPlayerTeamChange"
+	eventPlayerKicked      = "onPlayerKicked"
 	eventGameTick          = "onGameTick"
 	eventGamePause         = "onGamePause"
 	eventGameUnpause       = "onGameUnpause"
@@ -106,7 +107,16 @@ func registerEvents(r *Room, p *rod.Page) {
 			by: by.id
 		})
 	}`)
-	// onPlayerKicked
+
+	p.MustEval(`room.onPlayerKicked = function(player, reason, ban, by) {
+		emit({
+			type: "` + eventPlayerAdminChange + `",
+			reason: reason,
+			ban: ban,
+			id: player.id,
+			by: by.id
+		})
+	}`)
 
 	p.MustEval(`room.onGameTick = function() {
 		emit({
@@ -209,6 +219,13 @@ func proccessEvent(r *Room, j gson.JSON) (interface{}, error) {
 		by := r.GetPlayer(obj["by"].Int())
 		fun := r.events[typ].(func(*Player, *Player))
 		fun(p, by)
+	case eventPlayerKicked:
+		p := r.GetPlayer(obj["id"].Int())
+		by := r.GetPlayer(obj["by"].Int())
+		ban := obj["ban"].Bool()
+		reason := obj["reason"].String()
+		fun := r.events[typ].(func(*Player, string, bool, *Player))
+		fun(p, reason, ban, by)
 	case eventGameTick:
 		fun := r.events[typ].(func())
 		fun()
@@ -279,6 +296,10 @@ func (r *Room) OnPlayerAdminChange(fun func(p *Player, by *Player)) {
 
 func (r *Room) OnPlayerTeamChange(fun func(p *Player, by *Player)) {
 	r.events[eventPlayerTeamChange] = fun
+}
+
+func (r *Room) OnPlayerKicked(fun func(p *Player, reason string, ban bool, by *Player)) {
+	r.events[eventPlayerKicked] = fun
 }
 
 func (r *Room) OnGameTick(fun func()) {
