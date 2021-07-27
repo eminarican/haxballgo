@@ -125,6 +125,11 @@ func (r *Room) StopGame() {
 	r.page.MustEval(`room.stopGame()`)
 }
 
+// Sets the pause state of the game.
+func (r *Room) PauseGame(val bool) {
+    r.page.MustEval(`room.pauseGame(` + strconv.FormatBool(val) + `)`)
+}
+
 // Gets a player from room. (returns nil if player doesn't exists)
 func (r *Room) GetPlayer(id int) *Player {
 	defer r.pMutex.RUnlock()
