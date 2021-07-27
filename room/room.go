@@ -108,6 +108,13 @@ func (r *Room) SetDefaultStadium(name string) {
 	r.page.MustEval(`room.setDefaultStadium(` + name + `)`)
 }
 
+// Sets the teams lock. When teams are locked players are not able to change team unless they are moved by an admin.
+func (r *Room) SetTeamsLock(val bool) {
+	r.page.MustEval(`room.setTeamsLock(` + strconv.FormatBool(val) + `)`)
+}
+
+// setTeamColors
+
 // Gets a player from room. (returns nil if player doesn't exists)
 func (r *Room) GetPlayer(id int) *Player {
 	defer r.pMutex.RUnlock()
