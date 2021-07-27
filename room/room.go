@@ -1,6 +1,7 @@
 package room
 
 import (
+	"sync"
 	"time"
 
 	"github.com/go-rod/rod"
@@ -14,6 +15,8 @@ type Room struct {
 	page    *rod.Page
 	browser *rod.Browser
 	events  map[string]interface{}
+	players map[int]*Player
+	pMutex sync.RWMutex
 }
 
 func New() *Room {
@@ -33,6 +36,7 @@ func New() *Room {
 		page:    page,
 		browser: browser,
 		events:  make(map[string]interface{}),
+		players: make(map[int]*Player),
 	}
 
 	page.MustEval(conf.String())
@@ -56,4 +60,25 @@ func (r *Room) Shutdown() {
 
 func (r *Room) Announce(msg string) {
 	r.page.MustEval(`room.sendAnnouncement("` + msg + `")`)
+}
+
+func (r *Room) GetPlayer(id int) *Player {
+	defer r.pMutex.RUnlock()
+	r.pMutex.RLock()
+
+	return r.players[id]
+}
+
+func (r *Room) setPlayer(id int, p *Player) {
+	defer r.pMutex.Unlock()
+	r.pMutex.Lock()
+	
+	r.players[id] = p
+}
+
+func (r *Room) removePlayer(id int) {
+    defer r.pMutex.Unlock()
+	r.pMutex.Lock()
+	
+	delete(r.players, id)
 }

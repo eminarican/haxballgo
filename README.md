@@ -19,11 +19,11 @@
 ```go
 r := room.New()
 
-r.OnPlayerJoin(func(p room.Player) {
+r.OnPlayerJoin(func(p *room.Player) {
 	println("a player joined!")
 })
 
-r.OnPlayerLeave(func(p room.Player) {
+r.OnPlayerLeave(func(p *room.Player) {
 	println("a player leaved!")
 })
 

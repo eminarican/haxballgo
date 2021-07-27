@@ -25,24 +25,26 @@ const (
 )
 
 func registerEvents(r *Room, p *rod.Page) {
-	r.OnPlayerJoin(func (p Player) {})
-	r.OnPlayerLeave(func(p Player) {})
-	r.OnPlayerChat(func(p Player, msg string) {})
-	r.OnPlayerBallKick(func(p Player) {})
-	r.OnGameStart(func(by Player) {})
-	r.OnGameStop(func(by Player) {})
+	r.OnPlayerJoin(func (p *Player) {})
+	r.OnPlayerLeave(func(p *Player) {})
+	r.OnPlayerChat(func(p *Player, msg string) {})
+	r.OnPlayerBallKick(func(p *Player) {})
+	r.OnGameStart(func(by *Player) {})
+	r.OnGameStop(func(by *Player) {})
 	r.OnGameTick(func() {})
-	r.OnGamePause(func(p Player) {})
-	r.OnGameUnpause(func(p Player) {})
+	r.OnGamePause(func(p *Player) {})
+	r.OnGameUnpause(func(p *Player) {})
 	r.OnPositionsReset(func() {})
-	r.OnPlayerActivity(func(p Player) {})
-	r.OnStadiumChange(func(stadium string, by Player) {})
+	r.OnPlayerActivity(func(p *Player) {})
+	r.OnStadiumChange(func(stadium string, by *Player) {})
 	r.OnRoomLink(func(link string) {})
-	r.OnKickRateLimitSet(func(min, rate, burst int, by Player) {})
+	r.OnKickRateLimitSet(func(min, rate, burst int, by *Player) {})
 
 	p.MustEval(`room.onPlayerJoin = function(player) {
 		emit({
 			type: "` + eventPlayerJoin + `",
+			conn: player.conn,
+			name: player.name,
 			id: player.id
 		})
 	}`)
@@ -156,63 +158,65 @@ func proccessEvent(r *Room, j gson.JSON) (interface{}, error) {
 
 	switch typ {
 	case eventPlayerJoin:
-		p := newPlayer(r, obj["id"].Int())
-		fun := r.events[typ].(func(Player))
+		p := newPlayer(r, obj["id"].Int(), obj["conn"].String(), obj["name"].String())
+		fun := r.events[typ].(func(*Player))
+		r.setPlayer(p.Id(), p)
 		fun(p)
 	case eventPlayerLeave:
-		p := newPlayer(r, obj["id"].Int())
-		fun := r.events[typ].(func(Player))
+		p := r.GetPlayer(obj["id"].Int())
+		fun := r.events[typ].(func(*Player))
 		fun(p)
+		r.removePlayer(p.Id())
 	case eventPlayerChat:
-		p := newPlayer(r, obj["id"].Int())
+		p := r.GetPlayer(obj["id"].Int())
 		msg := obj["message"].String()
-		fun := r.events[typ].(func(Player, string))
+		fun := r.events[typ].(func(*Player, string))
 		fun(p, msg)
 	case eventPlayerBallKick:
-		p := newPlayer(r, obj["id"].Int())
-		fun := r.events[typ].(func(Player))
+		p := r.GetPlayer(obj["id"].Int())
+		fun := r.events[typ].(func(*Player))
 		fun(p)
-	case eventGameStart: // todo: nullable player
-		p := newPlayer(r, obj["id"].Int())
-		fun := r.events[typ].(func(Player))
+	case eventGameStart:
+		p := r.GetPlayer(obj["id"].Int())
+		fun := r.events[typ].(func(*Player))
 		fun(p)
-	case eventGameStop: // todo: nullable player
-		p := newPlayer(r, obj["id"].Int())
-		fun := r.events[typ].(func(Player))
+	case eventGameStop:
+	    p := r.GetPlayer(obj["id"].Int())
+		fun := r.events[typ].(func(*Player))
 		fun(p)
 	case eventGameTick:
 		fun := r.events[typ].(func())
 		fun()
 	case eventGamePause:
-		by := newPlayer(r, obj["id"].Int())
-		fun := r.events[typ].(func(Player))
+		by := r.GetPlayer(obj["id"].Int())
+		fun := r.events[typ].(func(*Player))
 		fun(by)
 	case eventGameUnpause:
-		by := newPlayer(r, obj["id"].Int())
-		fun := r.events[typ].(func(Player))
+		by := r.GetPlayer(obj["id"].Int())
+		fun := r.events[typ].(func(*Player))
 		fun(by)
 	case eventPositionsReset:
 		fun := r.events[typ].(func())
 		fun()
 	case eventPlayerActivity:
-		p := newPlayer(r, obj["id"].Int())
-		fun := r.events[typ].(func(Player))
+		p := r.GetPlayer(obj["id"].Int())
+		fun := r.events[typ].(func(*Player))
 		fun(p)
 	case eventStadiumChange:
-		by := newPlayer(r, obj["id"].Int())
+		by := r.GetPlayer(obj["id"].Int())
 		stadium := obj["stadium"].String()
-		fun := r.events[typ].(func(string, Player))
+		fun := r.events[typ].(func(string, *Player))
 		fun(stadium, by)
 	case eventRoomLink:
 		link := obj["link"].String()
 		fun := r.events[typ].(func(string))
 		fun(link)
 	case eventKickRateLimitSet:
-		by := newPlayer(r, obj["id"].Int())
+		by := r.GetPlayer(obj["id"].Int())
 		burst := obj["burst"].Int()
 		rate := obj["rate"].Int()
 		min := obj["min"].Int()
-		fun := r.events[typ].(func(int, int, int, Player))
+		fun := r.events[typ].(func(int, int, int, *Player))
 		fun(min, rate, burst, by)
 	default:
 		return nil, fmt.Errorf("event type %v is invalid", typ)
@@ -220,27 +224,27 @@ func proccessEvent(r *Room, j gson.JSON) (interface{}, error) {
 	return nil, nil
 }
 
-func (r *Room) OnPlayerJoin(fun func(Player)) {
+func (r *Room) OnPlayerJoin(fun func(*Player)) {
 	r.events[eventPlayerJoin] = fun
 }
 
-func (r *Room) OnPlayerLeave(fun func(Player)) {
+func (r *Room) OnPlayerLeave(fun func(*Player)) {
 	r.events[eventPlayerLeave] = fun
 }
 
-func (r *Room) OnPlayerChat(fun func(p Player, msg string)) {
+func (r *Room) OnPlayerChat(fun func(p *Player, msg string)) {
 	r.events[eventPlayerChat] = fun
 }
 
-func (r *Room) OnPlayerBallKick(fun func(Player)) {
+func (r *Room) OnPlayerBallKick(fun func(*Player)) {
 	r.events[eventPlayerBallKick] = fun
 }
 
-func (r *Room) OnGameStart(fun func(by Player)) {
+func (r *Room) OnGameStart(fun func(by *Player)) {
 	r.events[eventGameStart] = fun
 }
 
-func (r *Room) OnGameStop(fun func(by Player)) {
+func (r *Room) OnGameStop(fun func(by *Player)) {
 	r.events[eventGameStop] = fun
 }
 
@@ -248,11 +252,11 @@ func (r *Room) OnGameTick(fun func()) {
 	r.events[eventGameTick] = fun
 }
 
-func (r *Room) OnGamePause(fun func(Player)) {
+func (r *Room) OnGamePause(fun func(*Player)) {
 	r.events[eventGamePause] = fun
 }
 
-func (r *Room) OnGameUnpause(fun func(Player)) {
+func (r *Room) OnGameUnpause(fun func(*Player)) {
 	r.events[eventGameUnpause] = fun
 }
 
@@ -260,11 +264,11 @@ func (r *Room) OnPositionsReset(fun func()) {
 	r.events[eventPositionsReset] = fun
 }
 
-func (r *Room) OnPlayerActivity(fun func(Player)) {
+func (r *Room) OnPlayerActivity(fun func(*Player)) {
 	r.events[eventPlayerActivity] = fun
 }
 
-func (r *Room) OnStadiumChange(fun func(stadium string, by Player)) {
+func (r *Room) OnStadiumChange(fun func(stadium string, by *Player)) {
 	r.events[eventStadiumChange] = fun
 }
 
@@ -272,6 +276,6 @@ func (r *Room) OnRoomLink(fun func(link string)) {
 	r.events[eventRoomLink] = fun
 }
 
-func (r *Room) OnKickRateLimitSet(fun func(min int, rate int, burst int, by Player)) {
+func (r *Room) OnKickRateLimitSet(fun func(min int, rate int, burst int, by *Player)) {
 	r.events[eventKickRateLimitSet] = fun
 }
