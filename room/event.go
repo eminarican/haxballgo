@@ -24,7 +24,22 @@ const (
 	eventKickRateLimitSet = "onKickRateLimitSet"
 )
 
-func registerEvents(p *rod.Page) {
+func registerEvents(r *Room, p *rod.Page) {
+	r.OnPlayerJoin(func (p Player) {})
+	r.OnPlayerLeave(func(p Player) {})
+	r.OnPlayerChat(func(p Player, msg string) {})
+	r.OnPlayerBallKick(func(p Player) {})
+	r.OnGameStart(func(by Player) {})
+	r.OnGameStop(func(by Player) {})
+	r.OnGameTick(func() {})
+	r.OnGamePause(func(p Player) {})
+	r.OnGameUnpause(func(p Player) {})
+	r.OnPositionsReset(func() {})
+	r.OnPlayerActivity(func(p Player) {})
+	r.OnStadiumChange(func(stadium string, by Player) {})
+	r.OnRoomLink(func(link string) {})
+	r.OnKickRateLimitSet(func(min, rate, burst int, by Player) {})
+
 	p.MustEval(`room.onPlayerJoin = function(player) {
 		emit({
 			type: "` + eventPlayerJoin + `",

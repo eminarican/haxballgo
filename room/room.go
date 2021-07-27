@@ -41,7 +41,7 @@ func New() *Room {
 		return proccessEvent(r, j)
 	})
 
-	registerEvents(page)
+	registerEvents(r, page)
 
 	return r
 }
