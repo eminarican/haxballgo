@@ -51,13 +51,13 @@ func New() *Room {
 	return r
 }
 
-// Obtains room link (if token is invalid just pauses program)
+// Obtains room link. (if token is invalid just pauses program)
 func (r *Room) Link() string {
 	// todo: replace this with event based one
 	return r.page.MustElement("#roomlink a").MustText()
 }
 
-// Shuts down room
+// Shuts down room.
 func (r *Room) Shutdown() {
 	r.browser.MustClose()
 }
@@ -69,7 +69,12 @@ func (r *Room) Announce(msg string) {
 	r.page.MustEval(`room.sendAnnouncement("` + msg + `")`)
 }
 
-// Gets a player from room (returns nil if player doesn't exists)
+// Sends a chat message using the host player.
+func (r *Room) SendMessage(msg string) {
+	r.page.MustEval(`room.sendChat("` + msg + `")`)
+}
+
+// Gets a player from room. (returns nil if player doesn't exists)
 func (r *Room) GetPlayer(id int) *Player {
 	defer r.pMutex.RUnlock()
 	r.pMutex.RLock()
