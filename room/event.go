@@ -36,6 +36,7 @@ func registerEvents(r *Room, p *rod.Page) {
 	r.OnGameStop(func(by *Player) {})
 	r.OnPlayerAdminChange(func(p, by *Player) {})
 	r.OnPlayerTeamChange(func(p, by *Player) {})
+	r.OnPlayerKicked(func(p *Player, reason string, ban bool, by *Player) {})
 	r.OnGameTick(func() {})
 	r.OnGamePause(func(p *Player) {})
 	r.OnGameUnpause(func(p *Player) {})
