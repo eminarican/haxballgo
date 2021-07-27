@@ -1,6 +1,7 @@
 package room
 
 import (
+	"strconv"
 	"sync"
 	"time"
 
@@ -72,6 +73,17 @@ func (r *Room) Announce(msg string) {
 // Sends a chat message using the host player.
 func (r *Room) SendMessage(msg string) {
 	r.page.MustEval(`room.sendChat("` + msg + `")`)
+}
+
+// Clears the ban for a playerId that belonged 
+// to a player that was previously banned.
+func (r *Room) ClearBan(id int) {
+    r.page.MustEval(`room.clearBan(` + strconv.Itoa(id) + `)`)
+}
+
+// Clears the list of banned players.
+func (r *Room) ClearBans() {
+	r.page.MustEval(`room.clearBans()`)
 }
 
 // Gets a player from room. (returns nil if player doesn't exists)
