@@ -172,6 +172,11 @@ func (r*Room) SetPassword(val string) {
 	r.page.MustEval(`room.setPassword("` + val + `")`)
 }
 
+// Activates or deactivates the recaptcha requirement to join the room.
+func (r *Room) SetRequireRecaptcha(val bool ) {
+	r.page.MustEval(`room.setRequireRecaptcha(` + strconv.FormatBool(val) + `)`)
+}
+
 // Returns the current list of players.
 func (r *Room) GetPlayers() []*Player {
     defer r.pMutex.RUnlock()
