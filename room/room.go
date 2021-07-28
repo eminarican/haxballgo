@@ -198,6 +198,8 @@ func (r *Room) GetDiscCount() int {
     return r.page.MustEval(`room.getDiscCount()`).Int()
 }
 
+// CollisionFlags
+
 // Returns the current list of players.
 func (r *Room) GetPlayers() []*Player {
     defer r.pMutex.RUnlock()
