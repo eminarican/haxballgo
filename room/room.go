@@ -190,6 +190,14 @@ func (r *Room) SetKickRateLimit(min int, rate int, burst int) {
 	r.page.MustEval(`room.setKickRateLimit(` + strconv.Itoa(min) + `, ` + strconv.Itoa(rate) + `, ` + strconv.Itoa(burst) + `)`)
 }
 
+// setDiscProperties
+// getDiscProperties
+
+// Gets the number of discs in the game including the ball and player discs.
+func (r *Room) GetDiscCount() int {
+    return r.page.MustEval(`room.getDiscCount()`).Int()
+}
+
 // Returns the current list of players.
 func (r *Room) GetPlayers() []*Player {
     defer r.pMutex.RUnlock()

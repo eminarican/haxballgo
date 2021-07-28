@@ -49,6 +49,9 @@ func (p *Player) SetAvatar(val string) {
 	p.room.page.MustEval(`room.setPlayerAvatar(` + strconv.Itoa(p.id) + `, "` + val + `")`)
 }
 
+// setDiscProperties
+// getDiscProperties
+
 // Kicks player from room with aditional ban option.
 func (p *Player) Kick(reason string, ban bool) {
 	p.room.page.MustEval(`room.kickPlayer(` + strconv.Itoa(p.id) + `, "` + reason + `", ` + strconv.FormatBool(ban) + `)`)
