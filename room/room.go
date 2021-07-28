@@ -133,12 +133,17 @@ func (r *Room) PauseGame(val bool) {
 
 // getScores
 
+// Returns the ball's position in the field or null if no game is in progress.
 func (r *Room) GetBallPosition() *mgl32.Vec2 {
 	obj := r.page.MustEval(`room.getBallPosition()`).Map()
-	return &mgl32.Vec2{
-        float32(obj["x"].Num()),
-		float32(obj["y"].Num()),
-	}
+	if len(obj) == 2 {
+	    return &mgl32.Vec2{
+            float32(obj["x"].Num()),
+		    float32(obj["y"].Num()),
+	    }
+    } else {
+        return nil
+    }
 }
 
 // Returns the current list of players.
