@@ -173,8 +173,21 @@ func (r*Room) SetPassword(val string) {
 }
 
 // Activates or deactivates the recaptcha requirement to join the room.
-func (r *Room) SetRequireRecaptcha(val bool ) {
+func (r *Room) SetRequireRecaptcha(val bool) {
 	r.page.MustEval(`room.setRequireRecaptcha(` + strconv.FormatBool(val) + `)`)
+}
+
+// reorderPlayers
+
+// Sets the room's kick rate limits.
+//
+// `min` is the minimum number of logic-frames between two kicks. It is impossible to kick faster than this.
+//
+// `rate` works like `min` but lets players save up extra kicks to use them later depending on the value of `burst`.
+//
+// `burst` determines how many extra kicks the player is able to save up.
+func (r *Room) SetKickRateLimit() {
+	r.page.MustEval(`room.setKickRateLimit()`)
 }
 
 // Returns the current list of players.
