@@ -40,6 +40,7 @@ l.Infof("room link: %v", r.Link())
   "General": {
     "Name": "My Room",
     "Token": "",
+    "Debug": false,
     "MaxPlayer": 16
   },
   "Security": {

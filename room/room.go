@@ -54,6 +54,12 @@ func New() *Room {
 	})
 
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	zerolog.SetGlobalLevel(func() zerolog.Level {
+		if conf.General.Debug {
+			return zerolog.DebugLevel
+		}
+		return zerolog.InfoLevel
+	}())
 
 	registerEvents(r, page)
 

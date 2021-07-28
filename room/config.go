@@ -16,6 +16,7 @@ type Config struct {
 	General struct {
 		Name      string
 		Token     string
+		Debug     bool
 		MaxPlayer int
 	}
 	Security struct {
@@ -54,10 +55,12 @@ func defaultConfig() Config {
 		struct {
 			Name      string
 			Token     string
+			Debug     bool
 			MaxPlayer int
 		}{
 			"My Room",
 			"",
+			false,
 			16,
 		},
 		struct {
