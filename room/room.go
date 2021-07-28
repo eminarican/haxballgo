@@ -141,9 +141,8 @@ func (r *Room) GetBallPosition() *mgl32.Vec2 {
             float32(obj["x"].Num()),
 		    float32(obj["y"].Num()),
 	    }
-    } else {
-        return nil
     }
+    return nil
 }
 
 // Starts recording of a haxball replay.

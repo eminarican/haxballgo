@@ -1,6 +1,10 @@
 package room
 
-import "strconv"
+import (
+	"strconv"
+
+	"github.com/go-gl/mathgl/mgl32"
+)
 
 type Player struct {
 	room *Room
@@ -34,6 +38,17 @@ func (p *Player) Conn() string {
     return p.conn
 }
 
+func (p *Player) Position() *mgl32.Vec2 {
+	obj := p.room.page.MustEval(``).Map()
+	if len(obj) == 2 {
+	    return &mgl32.Vec2{
+	        float32(obj["x"].Num()),
+	        float32(obj["y"].Num()),
+	    }
+	}
+	return nil
+}
+
 // Sends a chat message to player using the host player.
 func (p *Player) SendMessage(msg string) {
 	p.room.page.MustEval(`room.sendChat("` + msg + `", ` + strconv.Itoa(p.id) + `)`)
@@ -44,6 +59,7 @@ func (p *Player) SetAdmin(val bool) {
 	p.room.page.MustEval(`room.setPlayerAdmin(` + strconv.Itoa(p.id) + `, ` + strconv.FormatBool(val) + `)`)
 }
 
+// Whether the player has admin rights.
 func (p *Player) IsAdmin() bool {
 	return p.room.page.MustEval(`room.getPlayer(` + strconv.Itoa(p.id) + `).admin`).Bool()
 }
