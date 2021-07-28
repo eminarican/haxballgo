@@ -146,6 +146,27 @@ func (r *Room) GetBallPosition() *mgl32.Vec2 {
     }
 }
 
+// Starts recording of a haxball replay.
+//
+// Don't forget to call stop recording or it will cause a memory leak.
+func (r* Room) StartRecording() {
+	r.page.MustEval(`room.startRecording()`)
+}
+
+// Stops the recording previously started with startRecording and returns the replay file contents as a []uint8.
+//
+// Returns null if recording was not started or had already been stopped.
+func (r *Room) StopRecording() []uint8 {
+	var buf []uint8
+	for _, b := range r.page.MustEval(`room.stopRecording()`).Arr() {
+		buf = append(buf, uint8(b.Int()))
+	}
+	if len(buf) == 0 {
+		return nil
+	} 
+	return buf
+}
+
 // Returns the current list of players.
 func (r *Room) GetPlayers() []*Player {
     defer r.pMutex.RUnlock()
