@@ -16,13 +16,14 @@ import (
 const target = "https://html5.haxball.com/hiF05fAx/__cache_static__/g/headless.html"
 
 type Room struct {
-	conf    *Config
-	page    *rod.Page
-	browser *rod.Browser
-	events  map[string]interface{}
-	players map[int]*Player
-	pMutex  sync.RWMutex
-	logger  *Logger
+	conf      *Config
+	page      *rod.Page
+	browser   *rod.Browser
+	events    map[string]interface{}
+	players   map[int]*Player
+	pMutex    sync.RWMutex
+	scheduler *Scheduler
+	logger    *Logger
 }
 
 // Creates a new room
@@ -39,12 +40,13 @@ func New() *Room {
 	time.Sleep(time.Second * 2)
 
 	r := &Room{
-		conf:    &conf,
-		page:    page,
-		browser: browser,
-		events:  make(map[string]interface{}),
-		players: make(map[int]*Player),
-		logger:  &Logger{},
+		conf:      &conf,
+		page:      page,
+		browser:   browser,
+		events:    make(map[string]interface{}),
+		players:   make(map[int]*Player),
+		scheduler: &Scheduler{},
+		logger:    &Logger{},
 	}
 
 	page.MustEval(conf.String())
@@ -75,6 +77,11 @@ func (r *Room) Link() string {
 // Gets logger.
 func (r *Room) Logger() *Logger {
 	return r.logger
+}
+
+// Gets scheduler.
+func (r *Room) Scheduler() *Scheduler {
+	return r.scheduler
 }
 
 // Shuts down room.
