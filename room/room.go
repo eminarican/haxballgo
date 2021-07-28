@@ -186,8 +186,8 @@ func (r *Room) SetRequireRecaptcha(val bool) {
 // `rate` works like `min` but lets players save up extra kicks to use them later depending on the value of `burst`.
 //
 // `burst` determines how many extra kicks the player is able to save up.
-func (r *Room) SetKickRateLimit() {
-	r.page.MustEval(`room.setKickRateLimit()`)
+func (r *Room) SetKickRateLimit(min int, rate int, burst int) {
+	r.page.MustEval(`room.setKickRateLimit(` + strconv.Itoa(min) + `, ` + strconv.Itoa(rate) + `, ` + strconv.Itoa(burst) + `)`)
 }
 
 // Returns the current list of players.
