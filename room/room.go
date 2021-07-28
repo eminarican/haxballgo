@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/go-gl/mathgl/mgl32"
 	"github.com/go-rod/rod"
 	"github.com/ysmood/gson"
 )
@@ -128,6 +129,16 @@ func (r *Room) StopGame() {
 // Sets the pause state of the game.
 func (r *Room) PauseGame(val bool) {
     r.page.MustEval(`room.pauseGame(` + strconv.FormatBool(val) + `)`)
+}
+
+// getScores
+
+func (r *Room) GetBallPosition() *mgl32.Vec2 {
+	obj := r.page.MustEval(`room.getBallPosition()`).Map()
+	return &mgl32.Vec2{
+        float32(obj["x"].Num()),
+		float32(obj["y"].Num()),
+	}
 }
 
 // Returns the current list of players.

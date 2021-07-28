@@ -1,3 +1,5 @@
+github.com/go-gl/mathgl v1.0.0 h1:t9DznWJlXxxjeeKLIdovCOVJQk/GzDEL7h/h+Ro2B68=
+github.com/go-gl/mathgl v1.0.0/go.mod h1:yhpkQzEiH9yPyxDUGzkmgScbaBVlhC06qodikEM0ZwQ=
 github.com/go-rod/rod v0.101.4 h1:PHNzgw5aE4cMf2/H+nYKJvSwzuYEphRovbGluDMohlc=
 github.com/go-rod/rod v0.101.4/go.mod h1:+iB8bs4SPa2DKxDUo1jy316LoQ5uEE6k58UfQdQTMhs=
 github.com/ysmood/goob v0.3.0 h1:XZ51cZJ4W3WCoCiUktixzMIQF86W7G5VFL4QQ/Q2uS0=
@@ -8,3 +10,6 @@ github.com/ysmood/gson v0.6.4 h1:Yb6tosv6bk59HqjZu2/7o4BFherpYEMkDkXmlhgryZ4=
 github.com/ysmood/gson v0.6.4/go.mod h1:3Kzs5zDl21g5F/BlLTNcuAGAYLKt2lV5G8D1zF3RNmg=
 github.com/ysmood/leakless v0.7.0 h1:XCGdaPExyoreoQd+H5qgxM3ReNbSPFsEXpSKwbXbwQw=
 github.com/ysmood/leakless v0.7.0/go.mod h1:R8iAXPRaG97QJwqxs74RdwzcRHT1SWCGTNqY8q0JvMQ=
+golang.org/x/image v0.0.0-20190321063152-3fc05d484e9f h1:FO4MZ3N56GnxbqxGKqh+YTzUWQ2sDwtFQEZgLOxh9Jc=
+golang.org/x/image v0.0.0-20190321063152-3fc05d484e9f/go.mod h1:kZ7UVZpmo3dzQBMxlp+ypCbDeSB+sBbTgSJuh5dn5js=
+golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
