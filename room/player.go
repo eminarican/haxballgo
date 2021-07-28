@@ -39,12 +39,17 @@ func (p *Player) SendMessage(msg string) {
 	p.room.page.MustEval(`room.sendChat("` + msg + `", ` + strconv.Itoa(p.id) + `)`)
 }
 
-// Sets player admin privileges
+// Sets player admin privileges.
 func (p *Player) SetAdmin(val bool) {
 	p.room.page.MustEval(`room.setPlayerAdmin(` + strconv.Itoa(p.id) + `, ` + strconv.FormatBool(val) + `)`)
 }
 
-// Kicks player from room with aditional ban option
+// Overrides the avatar of the player.
+func (p *Player) SetAvatar(val string) {
+	p.room.page.MustEval(`room.setPlayerAvatar(` + strconv.Itoa(p.id) + `, "` + val + `")`)
+}
+
+// Kicks player from room with aditional ban option.
 func (p *Player) Kick(reason string, ban bool) {
 	p.room.page.MustEval(`room.kickPlayer(` + strconv.Itoa(p.id) + `, "` + reason + `", ` + strconv.FormatBool(ban) + `)`)
 }
