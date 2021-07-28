@@ -167,6 +167,11 @@ func (r *Room) StopRecording() []uint8 {
 	return buf
 }
 
+// Changes the password of the room, if pass is null the password will be cleared.
+func (r*Room) SetPassword(val string) {
+	r.page.MustEval(`room.setPassword("` + val + `")`)
+}
+
 // Returns the current list of players.
 func (r *Room) GetPlayers() []*Player {
     defer r.pMutex.RUnlock()
