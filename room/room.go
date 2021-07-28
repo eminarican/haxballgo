@@ -1,12 +1,15 @@
 package room
 
 import (
+	"os"
 	"strconv"
 	"sync"
 	"time"
 
 	"github.com/go-gl/mathgl/mgl32"
 	"github.com/go-rod/rod"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/ysmood/gson"
 )
 
@@ -19,6 +22,7 @@ type Room struct {
 	events  map[string]interface{}
 	players map[int]*Player
 	pMutex  sync.RWMutex
+	logger  *Logger
 }
 
 // Creates a new room
@@ -40,6 +44,7 @@ func New() *Room {
 		browser: browser,
 		events:  make(map[string]interface{}),
 		players: make(map[int]*Player),
+		logger:  &Logger{},
 	}
 
 	page.MustEval(conf.String())
@@ -47,6 +52,8 @@ func New() *Room {
 	page.MustExpose("emit", func(j gson.JSON) (interface{}, error) {
 		return proccessEvent(r, j)
 	})
+
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
 	registerEvents(r, page)
 
@@ -57,6 +64,11 @@ func New() *Room {
 func (r *Room) Link() string {
 	// todo: replace this with event based one
 	return r.page.MustElement("#roomlink a").MustText()
+}
+
+// Gets logger.
+func (r *Room) Logger() *Logger {
+	return r.logger
 }
 
 // Shuts down room.
@@ -76,10 +88,10 @@ func (r *Room) SendMessage(msg string) {
 	r.page.MustEval(`room.sendChat("` + msg + `")`)
 }
 
-// Clears the ban for a playerId that belonged 
+// Clears the ban for a playerId that belonged
 // to a player that was previously banned.
 func (r *Room) ClearBan(id int) {
-    r.page.MustEval(`room.clearBan(` + strconv.Itoa(id) + `)`)
+	r.page.MustEval(`room.clearBan(` + strconv.Itoa(id) + `)`)
 }
 
 // Clears the list of banned players.
@@ -91,7 +103,7 @@ func (r *Room) ClearBans() {
 //
 // If a game is in progress this method does nothing.
 func (r *Room) SetTimeLimit(val int) {
-    r.page.MustEval(`room.setTimeLimit(` + strconv.Itoa(val) + `)`)
+	r.page.MustEval(`room.setTimeLimit(` + strconv.Itoa(val) + `)`)
 }
 
 // Parses the value as a .hbs stadium file and sets it as the selected stadium.
@@ -128,7 +140,7 @@ func (r *Room) StopGame() {
 
 // Sets the pause state of the game.
 func (r *Room) PauseGame(val bool) {
-    r.page.MustEval(`room.pauseGame(` + strconv.FormatBool(val) + `)`)
+	r.page.MustEval(`room.pauseGame(` + strconv.FormatBool(val) + `)`)
 }
 
 // getScores
@@ -137,18 +149,18 @@ func (r *Room) PauseGame(val bool) {
 func (r *Room) GetBallPosition() *mgl32.Vec2 {
 	obj := r.page.MustEval(`room.getBallPosition()`).Map()
 	if len(obj) == 2 {
-	    return &mgl32.Vec2{
-            float32(obj["x"].Num()),
-		    float32(obj["y"].Num()),
-	    }
-    }
-    return nil
+		return &mgl32.Vec2{
+			float32(obj["x"].Num()),
+			float32(obj["y"].Num()),
+		}
+	}
+	return nil
 }
 
 // Starts recording of a haxball replay.
 //
 // Don't forget to call stop recording or it will cause a memory leak.
-func (r* Room) StartRecording() {
+func (r *Room) StartRecording() {
 	r.page.MustEval(`room.startRecording()`)
 }
 
@@ -162,12 +174,12 @@ func (r *Room) StopRecording() []uint8 {
 	}
 	if len(buf) == 0 {
 		return nil
-	} 
+	}
 	return buf
 }
 
 // Changes the password of the room, if pass is null the password will be cleared.
-func (r*Room) SetPassword(val string) {
+func (r *Room) SetPassword(val string) {
 	r.page.MustEval(`room.setPassword("` + val + `")`)
 }
 
@@ -194,18 +206,18 @@ func (r *Room) SetKickRateLimit(min int, rate int, burst int) {
 
 // Gets the number of discs in the game including the ball and player discs.
 func (r *Room) GetDiscCount() int {
-    return r.page.MustEval(`room.getDiscCount()`).Int()
+	return r.page.MustEval(`room.getDiscCount()`).Int()
 }
 
 // CollisionFlags
 
 // Returns the current list of players.
 func (r *Room) GetPlayers() []*Player {
-    defer r.pMutex.RUnlock()
+	defer r.pMutex.RUnlock()
 	r.pMutex.Lock()
 
-    slice := make([]*Player, len(r.players))
-    for _, p := range r.players {
+	slice := make([]*Player, len(r.players))
+	for _, p := range r.players {
 		slice = append(slice, p)
 	}
 	return slice
