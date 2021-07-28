@@ -18,16 +18,17 @@
 ## 💡 Simple usage
 ```go
 r := room.New()
+l := r.Logger()
 
 r.OnPlayerJoin(func(p *room.Player) {
-	println("a player joined!")
+	l.Info("a player joined!")
 })
 
 r.OnPlayerLeave(func(p *room.Player) {
-	println("a player leaved!")
+	l.Info("a player leaved!")
 })
 
-println("room link:", r.Link())
+l.Infof("room link: %v", r.Link())
 ```
 ```json
 # auto-generated config.json
