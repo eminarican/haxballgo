@@ -44,6 +44,10 @@ func (p *Player) SetAdmin(val bool) {
 	p.room.page.MustEval(`room.setPlayerAdmin(` + strconv.Itoa(p.id) + `, ` + strconv.FormatBool(val) + `)`)
 }
 
+func (p *Player) IsAdmin() bool {
+	return p.room.page.MustEval(`room.getPlayer(` + strconv.Itoa(p.id) + `).admin`).Bool()
+}
+
 // Overrides the avatar of the player.
 func (p *Player) SetAvatar(val string) {
 	p.room.page.MustEval(`room.setPlayerAvatar(` + strconv.Itoa(p.id) + `, "` + val + `")`)
