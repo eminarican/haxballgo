@@ -52,6 +52,7 @@ func New() *Room {
 		logger:    &Logger{},
 	}
 
+	l := r.Logger()
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	zerolog.SetGlobalLevel(func() zerolog.Level {
 		if conf.General.Debug {
@@ -60,7 +61,7 @@ func New() *Room {
 		return zerolog.InfoLevel
 	}())
 
-	r.Logger().Info("Starting room...")
+	l.Info("Starting room...")
 
 	page.MustEval(conf.String())
 
@@ -77,10 +78,11 @@ func New() *Room {
 
 	select {
 	case <-stop:
-		r.Logger().Error("Token is not valid!")
+		l.Error("Token is not valid!")
 		os.Exit(1)
 	case link := <-link:
-		r.Logger().Infof("Successfully started! Room link: %v", link)
+		l.Info("Successfully started!")
+		l.Infof("Room link: %v", link)
 		r.link = link
 	}
 	return r
