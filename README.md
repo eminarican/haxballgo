@@ -20,8 +20,10 @@
 ```go
 func main() {
   r := room.New()
-  l := r.Logger()
   defer r.Shutdown()
+  
+  l := r.Logger()
+  s := r.Scheduler()
 
   r.OnPlayerJoin(func(p *room.Player) {
 	  l.Info("A player joined!")
@@ -29,6 +31,10 @@ func main() {
 
   r.OnPlayerLeave(func(p *room.Player) {
 	  l.Info("A player leaved!")
+  })
+
+  s.Repeating(time.Second, func(){
+    r.Announce("Test message")
   })
 }
 ```
