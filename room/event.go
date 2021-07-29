@@ -27,7 +27,7 @@ const (
 	eventKickRateLimitSet  = "onKickRateLimitSet"
 )
 
-func registerEvents(r *Room, p *rod.Page) {
+func registerEvents(r *Room, p *rod.Page) (link chan string) {
 	r.OnPlayerJoin(func(p *Player) {})
 	r.OnPlayerLeave(func(p *Player) {})
 	r.OnPlayerChat(func(p *Player, msg string) (send bool) { return true })
@@ -43,8 +43,12 @@ func registerEvents(r *Room, p *rod.Page) {
 	r.OnPositionsReset(func() {})
 	r.OnPlayerActivity(func(p *Player) {})
 	r.OnStadiumChange(func(stadium string, by *Player) {})
-	r.OnRoomLink(func(link string) {})
 	r.OnKickRateLimitSet(func(min, rate, burst int, by *Player) {})
+
+	ch := make(chan string)
+	r.OnRoomLink(func(link string) {
+		ch <- link
+	})
 
 	p.MustEval(`room.onPlayerJoin = function(player) {
 		emit({
@@ -179,6 +183,8 @@ func registerEvents(r *Room, p *rod.Page) {
 			id: by.id
 		})
 	}`)
+
+	return ch
 }
 
 func proccessEvent(r *Room, j gson.JSON) (interface{}, error) {

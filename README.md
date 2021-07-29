@@ -24,14 +24,12 @@ func main() {
   defer r.Shutdown()
 
   r.OnPlayerJoin(func(p *room.Player) {
-	  l.Info("a player joined!")
+	  l.Info("A player joined!")
   })
 
   r.OnPlayerLeave(func(p *room.Player) {
-	  l.Info("a player leaved!")
+	  l.Info("A player leaved!")
   })
-
-  l.Infof("room link: %v", r.Link())
 }
 ```
 

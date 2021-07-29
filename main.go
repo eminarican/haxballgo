@@ -21,6 +21,4 @@ func main() {
 		l.Infof("%v:%v", p.Name(), msg)
 		return true
 	})
-
-	l.Infof("Successfully started! Room link: %v", r.Link())
 }

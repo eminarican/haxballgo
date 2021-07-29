@@ -26,6 +26,7 @@ type Room struct {
 	pMutex    sync.RWMutex
 	scheduler *Scheduler
 	logger    *Logger
+	link      string
 }
 
 // Creates a new room
@@ -51,12 +52,6 @@ func New() *Room {
 		logger:    &Logger{},
 	}
 
-	page.MustEval(conf.String())
-
-	page.MustExpose("emit", func(j gson.JSON) (interface{}, error) {
-		return proccessEvent(r, j)
-	})
-
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	zerolog.SetGlobalLevel(func() zerolog.Level {
 		if conf.General.Debug {
@@ -65,15 +60,35 @@ func New() *Room {
 		return zerolog.InfoLevel
 	}())
 
-	registerEvents(r, page)
+	r.Logger().Info("Starting room...")
 
+	page.MustEval(conf.String())
+
+	page.MustExpose("emit", func(j gson.JSON) (interface{}, error) {
+		return proccessEvent(r, j)
+	})
+
+	link := registerEvents(r, page)
+	stop := make(chan bool)
+
+	r.Scheduler().Delayed(5*time.Second, func() {
+		stop <- true
+	})
+
+	select {
+	case <-stop:
+		r.Logger().Error("Token is not valid!")
+		os.Exit(1)
+	case link := <-link:
+		r.Logger().Infof("Successfully started! Room link: %v", link)
+		r.link = link
+	}
 	return r
 }
 
-// Obtains room link. (if token is invalid just pauses program)
+// Obtains room link.
 func (r *Room) Link() string {
-	// todo: replace this with event based one
-	return r.page.MustElement("#roomlink a").MustText()
+	return r.link
 }
 
 // Gets logger.
