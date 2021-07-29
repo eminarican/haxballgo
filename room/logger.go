@@ -1,6 +1,10 @@
 package room
 
-import "github.com/rs/zerolog/log"
+import (
+	"fmt"
+
+	"github.com/rs/zerolog/log"
+)
 
 type Logger struct{}
 
@@ -9,7 +13,7 @@ func (*Logger) Error(msg string) {
 }
 
 func (*Logger) Errorf(format string, v ...interface{}) {
-	log.Error().Msgf(format, v...)
+	log.Error().Msg(fmt.Sprintf(format, v...))
 }
 
 func (*Logger) Warn(msg string) {
@@ -17,7 +21,7 @@ func (*Logger) Warn(msg string) {
 }
 
 func (*Logger) Warnf(format string, v ...interface{}) {
-	log.Warn().Msgf(format, v)
+	log.Warn().Msg(fmt.Sprintf(format, v...))
 }
 
 func (*Logger) Info(msg string) {
@@ -25,7 +29,7 @@ func (*Logger) Info(msg string) {
 }
 
 func (*Logger) Infof(format string, v ...interface{}) {
-	log.Info().Msgf(format, v)
+	log.Info().Msg(fmt.Sprintf(format, v...))
 }
 
 func (*Logger) Debug(msg string) {
@@ -33,5 +37,5 @@ func (*Logger) Debug(msg string) {
 }
 
 func (*Logger) Debugf(format string, v ...interface{}) {
-	log.Debug().Msgf(format, v)
+	log.Debug().Msg(fmt.Sprintf(format, v...))
 }
