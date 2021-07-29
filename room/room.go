@@ -2,8 +2,10 @@ package room
 
 import (
 	"os"
+	"os/signal"
 	"strconv"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/go-gl/mathgl/mgl32"
@@ -84,8 +86,11 @@ func (r *Room) Scheduler() *Scheduler {
 	return r.scheduler
 }
 
-// Shuts down room.
+// Waits receive signal to shutdown room properly.
 func (r *Room) Shutdown() {
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	<-c
 	r.browser.MustClose()
 }
 

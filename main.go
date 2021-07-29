@@ -2,9 +2,6 @@ package main
 
 import (
 	"haxball/room"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 func main() {
@@ -26,8 +23,4 @@ func main() {
 	})
 
 	l.Infof("Successfully started! Room link: %v", r.Link())
-
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	<-c
 }
