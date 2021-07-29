@@ -15,20 +15,21 @@ func (Scheduler) Delayed(delay time.Duration, fun func()) {
 	}()
 }
 
-func (Scheduler) Repeating(period time.Duration, fun func()) func() {
-	cancel := make(chan bool)
+func (Scheduler) Repeating(period time.Duration, fun func(stop func())) func() {
+	ch := make(chan bool)
+	cancel := func() {
+	    ch <- true
+	}
 	go func() {
 		ticker := time.NewTicker(period)
 		for {
 			select {
 			case <-ticker.C:
-				fun()
-		    case <-cancel:
+				fun(cancel)
+		    case <-ch:
 				return
 			}
 		}
 	}()
-	return func() {
-		cancel <- true
-	}
+	return cancel
 }
