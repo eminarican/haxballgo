@@ -33,7 +33,7 @@ func main() {
 	  l.Info("A player leaved!")
   })
 
-  s.Repeating(time.Second, func(){
+  s.Repeating(time.Second, func(stop func()){
     r.Announce("Test message")
   })
 }
