@@ -15,15 +15,20 @@ func (Scheduler) Delayed(duration time.Duration, fun func()) {
 	}()
 }
 
-func (Scheduler) Repeating(duration time.Duration, fun func()) {
+func (Scheduler) Repeating(duration time.Duration, fun func()) func() {
+	cancel := make(chan bool)
 	go func() {
 		ticker := time.NewTicker(duration)
 		for {
 			select {
 			case <-ticker.C:
 				fun()
-				// todo: cancel task
+		    case <-cancel:
+				return
 			}
 		}
 	}()
+	return func() {
+		cancel <- true
+	}
 }
