@@ -3,21 +3,15 @@
 
 <p align="center">
   <a href="https://opensource.org/licenses/gpl-3.0.html">
-
     <img alt="License" src="https://img.shields.io/github/license/eminarican/haxballgo?color=success&style=for-the-badge">
-
   </a>
 
   <a href="https://github.com/eminarican/haxballgo/issues">
-
     <img alt="GitHub Issues" src="https://img.shields.io/github/issues/eminarican/haxballgo?style=for-the-badge">
-
   </a>
 
   <a href="https://github.com/eminarican/haxballgo/stargazers">
-
     <img alt="GitHub Stars" src="https://img.shields.io/github/stars/eminarican/haxballgo?style=for-the-badge">
-
   </a>
 </p>
 
