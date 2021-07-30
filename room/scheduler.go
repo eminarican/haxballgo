@@ -6,6 +6,7 @@ import (
 
 type Scheduler struct{}
 
+// Creates a delayed task.
 func (Scheduler) Delayed(delay time.Duration, fun func()) {
 	go func() {
 		ticker := time.NewTicker(delay)
@@ -15,6 +16,7 @@ func (Scheduler) Delayed(delay time.Duration, fun func()) {
 	}()
 }
 
+// Creates a repeating task.
 func (Scheduler) Repeating(period time.Duration, fun func(stop func())) func() {
 	ch := make(chan bool)
 	cancel := func() {
@@ -34,6 +36,7 @@ func (Scheduler) Repeating(period time.Duration, fun func(stop func())) func() {
 	return cancel
 }
 
+// Creates a delayed repeating task.
 func (*Scheduler) DelayedRepeating(delay time.Duration, period time.Duration, fun func(stop func())) func() {
 	ch := make(chan bool)
 	cancel := func() {

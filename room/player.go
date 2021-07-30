@@ -25,26 +25,26 @@ func newPlayer(r *Room, id int, conn string, name string) *Player {
 
 // Returns player id.
 func (p *Player) Id() int {
-    return p.id
+	return p.id
 }
 
 // Returns player name.
 func (p *Player) Name() string {
-    return p.name
+	return p.name
 }
 
 // Returns player conn.
 func (p *Player) Conn() string {
-    return p.conn
+	return p.conn
 }
 
 func (p *Player) Position() *mgl32.Vec2 {
 	obj := p.room.page.MustEval(``).Map()
 	if len(obj) == 2 {
-	    return &mgl32.Vec2{
-	        float32(obj["x"].Num()),
-	        float32(obj["y"].Num()),
-	    }
+		return &mgl32.Vec2{
+			float32(obj["x"].Num()),
+			float32(obj["y"].Num()),
+		}
 	}
 	return nil
 }
