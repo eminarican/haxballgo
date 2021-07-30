@@ -26,11 +26,11 @@ func main() {
   s := r.Scheduler()
 
   r.OnPlayerJoin(func(p *room.Player) {
-	  l.Info("A player joined!")
+	  l.Infof("Player %v joined!", p.Name())
   })
 
   r.OnPlayerLeave(func(p *room.Player) {
-	  l.Info("A player leaved!")
+	  l.Infof("Player %v leaved!", p.Name())
   })
 
   s.Repeating(time.Second, func(stop func()){
