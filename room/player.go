@@ -1,6 +1,7 @@
 package room
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/go-gl/mathgl/mgl32"
@@ -50,8 +51,13 @@ func (p *Player) Position() *mgl32.Vec2 {
 	return nil
 }
 
+// Sends a formatted chat message to player using the host player.
+func (p *Player) Messagef(format string, v ...interface{}) {
+	p.room.page.MustEval(`room.sendChat("` + fmt.Sprintf(format, v...) + `", ` + strconv.Itoa(p.id) + `)`)
+}
+
 // Sends a chat message to player using the host player.
-func (p *Player) SendMessage(msg string) {
+func (p *Player) Message(msg string) {
 	p.room.page.MustEval(`room.sendChat("` + msg + `", ` + strconv.Itoa(p.id) + `)`)
 }
 
