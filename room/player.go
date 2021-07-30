@@ -53,7 +53,7 @@ func (p *Player) Position() *mgl32.Vec2 {
 
 // Sends a formatted chat message to player using the host player.
 func (p *Player) Messagef(format string, v ...interface{}) {
-	p.room.page.MustEval(`room.sendChat("` + fmt.Sprintf(format, v...) + `", ` + strconv.Itoa(p.id) + `)`)
+	p.Message(fmt.Sprintf(format, v...))
 }
 
 // Sends a chat message to player using the host player.
