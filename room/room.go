@@ -127,6 +127,11 @@ func (r *Room) Announce(msg string) {
 	r.page.MustEval(`room.sendAnnouncement("` + msg + `")`)
 }
 
+// Sends a formatted chat message using the host player.
+func (r *Room) Messagef(format string, v ...interface{}) {
+	r.Message(fmt.Sprintf(format, v...))
+}
+
 // Sends a chat message using the host player.
 func (r *Room) Message(msg string) {
 	r.page.MustEval(`room.sendChat("` + msg + `")`)

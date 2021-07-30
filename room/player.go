@@ -39,6 +39,11 @@ func (p *Player) Conn() string {
 	return p.conn
 }
 
+// Returns player team.
+func (p *Player) Team() team {
+	return team(p.room.page.MustEval(`room.getPlayer(` + strconv.Itoa(p.id) + `).team`).Int())
+}
+
 // The player's position in the field, if the player is not in the field the value will be null.
 func (p *Player) Position() *mgl32.Vec2 {
 	obj := p.room.page.MustEval(`room.getPlayer(` + strconv.Itoa(p.id) + `).position`).Map()
@@ -49,6 +54,19 @@ func (p *Player) Position() *mgl32.Vec2 {
 		}
 	}
 	return nil
+}
+
+// Sends a formatted host announcement with msg as contents. Unlike sendChat,
+// announcements will work without a host player and has a larger limit on the number of characters.
+func (p *Player) Announcef(format string, v ...interface{}) {
+	p.Announce(fmt.Sprintf(format, v...))
+}
+
+// Sends a host announcement with msg as contents. Unlike sendChat,
+// announcements will work without a host player and has a larger limit on the number of characters.
+func (p *Player) Announce(msg string) {
+	// todo: add missing fields
+	p.room.page.MustEval(`room.sendAnnouncement("` + msg + `", ` + strconv.Itoa(p.id) + `)`)
 }
 
 // Sends a formatted chat message to player using the host player.
