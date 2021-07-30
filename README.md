@@ -1,5 +1,5 @@
 <h1 align="center">Haxballgo</h1>
-<p align="center"><strong>Haxball headless API wrapper for Go</strong></p>
+<p align="center"><strong>Haxball room API for Go</strong></p>
 
 <p align="center">
   <a href="https://opensource.org/licenses/gpl-3.0.html">
