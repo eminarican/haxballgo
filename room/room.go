@@ -117,8 +117,7 @@ func (r *Room) Shutdown() {
 // Sends a formatted host announcement with msg as contents. Unlike sendChat,
 // announcements will work without a host player and has a larger limit on the number of characters.
 func (r *Room) Announcef(format string, v ...interface{}) {
-	// todo: add missing fields
-	r.page.MustEval(`room.sendAnnouncement("` + fmt.Sprintf(format, v...) + `")`)
+	r.Announce(fmt.Sprintf(format, v...))
 }
 
 // Sends a host announcement with msg as contents. Unlike sendChat,
