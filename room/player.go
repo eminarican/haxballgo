@@ -38,8 +38,9 @@ func (p *Player) Conn() string {
 	return p.conn
 }
 
+// The player's position in the field, if the player is not in the field the value will be null.
 func (p *Player) Position() *mgl32.Vec2 {
-	obj := p.room.page.MustEval(``).Map()
+	obj := p.room.page.MustEval(`room.getPlayer(` + strconv.Itoa(p.id) + `).position`).Map()
 	if len(obj) == 2 {
 		return &mgl32.Vec2{
 			float32(obj["x"].Num()),
