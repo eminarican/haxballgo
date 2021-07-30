@@ -53,9 +53,11 @@ func New() *Room {
 	}
 
 	l := r.Logger()
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	if conf.Logging.Pretty {
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	}
 	zerolog.SetGlobalLevel(func() zerolog.Level {
-		if conf.General.Debug {
+		if conf.Logging.Debug {
 			return zerolog.DebugLevel
 		}
 		return zerolog.InfoLevel

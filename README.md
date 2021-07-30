@@ -43,18 +43,21 @@ func main() {
 # auto-generated config.json
 {
   "Bot": {
-    "Active": true,
+    "Active": false,
     "Name": "Bot"
   },
   "General": {
     "Name": "My Room",
     "Token": "",
-    "Debug": false,
     "MaxPlayer": 16
   },
   "Security": {
-    "Public": false,
+    "Public": true,
     "Password": ""
+  },
+  "Logging": {
+    "Debug": false,
+    "Pretty": true
   }
 }
 ```
