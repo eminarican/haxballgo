@@ -180,7 +180,14 @@ func (r *Room) PauseGame(val bool) {
 	r.page.MustEval(`room.pauseGame(` + strconv.FormatBool(val) + `)`)
 }
 
-// getScores
+// If a game is in progress it returns the current score information. Otherwise it returns null.
+func (r *Room) GetScores() *scores {
+	obj := r.page.MustEval(`room.getScores()`).Map()
+	if len(obj) != 0 {
+		return newScores(obj)
+	}
+	return nil
+}
 
 // Returns the ball's position in the field or null if no game is in progress.
 func (r *Room) GetBallPosition() *mgl32.Vec2 {
