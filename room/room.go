@@ -128,7 +128,7 @@ func (r *Room) Announce(msg string) {
 }
 
 // Sends a chat message using the host player.
-func (r *Room) SendMessage(msg string) {
+func (r *Room) Message(msg string) {
 	r.page.MustEval(`room.sendChat("` + msg + `")`)
 }
 
