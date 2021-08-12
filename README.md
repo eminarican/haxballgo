@@ -1,3 +1,4 @@
+<p align="center"><img src=".github/assets/logo.png" width="200px" alt="logo"/></p>
 <h1 align="center">Haxballgo</h1>
 <p align="center"><strong>Haxball room API for Go</strong></p>
 
