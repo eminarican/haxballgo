@@ -1,4 +1,4 @@
-module github.com/eminarican/haxball
+module github.com/eminarican/haxballgo
 
 go 1.16
 
