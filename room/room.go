@@ -16,7 +16,7 @@ import (
 	"github.com/ysmood/gson"
 )
 
-const target = "https://html5.haxball.com/hiF05fAx/__cache_static__/g/headless.html"
+const target = "https://www.haxball.com/PFj3geCw/__cache_static__/g/headless.html"
 
 type Room struct {
 	conf      *Config
